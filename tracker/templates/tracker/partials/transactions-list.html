@@ -1,5 +1,6 @@
 {% load widget_tweaks %}
 {% load humanize %}
+
 <div class="flex flex-col-reverse md:grid md:grid-cols-4 md:gap-4" id="transaction-container">
     <div class="col-span-3">
       <div class="my-4">
@@ -22,9 +23,22 @@
         </table>
 
       </div>
-      <h1 class= "prose prose-2xl text-white mt-8 mb-4">
-        Transactions
-      </h1>
+      <div class="flex justify-between items-center">
+        <h1 class= "prose prose-2xl text-white mt-8 mb-4">
+          Transactions
+        </h1>
+        <a 
+          hx-get="{% url 'create_transaction' %}"
+          hx-push-url="true"
+          hx-target="#transaction-block"
+          class="cursor-pointer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="green" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-12">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+        </a>
+        
+      </div>
       
       {% if filter.qs %}
       <table class="table">
