@@ -1,0 +1,26 @@
+{% load widget_tweaks %}
+<div class="mb-2 form-control">
+    {{ form.type|add_label_class:"label text-white" }} 
+    {% render_field form.type class="select bg-gray-50 text-gray-900 input-md" %}
+</div>
+<div class="mb-2 form-control">
+    {{ form.amount|add_label_class:"label text-white" }} 
+    {% render_field form.amount class="input bg-gray-50 text-gray-900 input-md" %}
+</div>
+<div class="mb-2 form-control">
+    {{ form.date|add_label_class:"label text-white" }} 
+    
+    {% if form.date.errors %}
+        {% render_field form.date class="input input-bordered input-error text-red-900" %}
+        <div class="text-red-600 italic font-semibold">
+            {{ form.date.errors }}
+        </div>
+    {% else %}
+        {% render_field form.date class="input bg-gray-50 text-gray-900 input-md" %}
+    {% endif %}
+</div>
+<div class="mb-2 form-control">
+    {{ form.category|add_label_class:"label text-white" }} 
+    {% render_field form.category class="text-green-500 border-gray-300 rounded focus:ring-green-500" %}
+</div>
+<div>

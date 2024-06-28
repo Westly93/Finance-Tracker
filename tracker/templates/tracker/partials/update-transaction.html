@@ -1,12 +1,12 @@
 {% load widget_tweaks %}
 <section>
     <h1 class= "prose prose-2xl text-white mt-8 mb-4">
-        Create Transaction
+        Update Transaction
     </h1>
-    <form hx-post="{% url 'create_transaction' %}"
+    <form hx-post="{% url 'update_transaction' transaction.id %}"
     >
         {% include 'tracker/partials/transaction-form.html' %}
-        <button class="btn btn-success">Create</button>
+        <button class="btn btn-success">Update</button>
         <button hx-get="{% url 'transactions_list' %}" hx-target="#transaction-block" hx-push-url="true" class="btn btn-error">Cancel</button>
         </div>
     </form>

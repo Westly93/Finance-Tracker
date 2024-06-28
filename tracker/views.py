@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Transaction
 from .forms import TransactionForm
 from .filters import TransactionFilter
-
+from django_htmx.http import retarget
 # Create your views here.
 
 
@@ -50,9 +50,45 @@ def create_transaction(request):
             context = {
                 "form": form
             }
-            return render(request, 'tracker/partials/create_transaction.html', context)
+            response=  render(request, 'tracker/partials/create_transaction.html', context)
+            return retarget(response, '#transaction-block')
     form = TransactionForm()
     context = {
         "form": form
     }
     return render(request, 'tracker/partials/create_transaction.html', context)
+
+
+@login_required
+def update_transaction(request, pk):
+    transaction= get_object_or_404(Transaction, pk=pk, user= request.user)
+    if request.method== "POST":
+        form= TransactionForm(request.POST, instance=transaction)
+        if form.is_valid():
+            form.save()
+            context = {
+                "message": "The Transaction was updated successfully!"
+            }
+            return render(request, 'tracker/partials/transaction-success.html', context)
+        else:
+            context= {
+                'form':form,
+                "transaction": transaction
+            }
+            response= render(request, 'tracker/partials/update-transaction.html', context)
+            return retarget(response, "#block-transaction")
+    form= TransactionForm(instance= transaction)
+    context={
+        'transaction': transaction,
+        'form': form
+    }
+    return render(request, 'tracker/partials/update-transaction.html', context)
+@login_required
+def delete_transaction(request, pk):
+    transaction= get_object_or_404(Transaction, pk=pk, user= request.user)
+    transaction.delete()
+    context = {
+                "message": f"The { transaction.type } tansaction created on {transaction.date} was deleted successfully!"
+            }
+    return render(request, 'tracker/partials/transaction-success.html', context)
+    
