@@ -28,16 +28,38 @@
         <h1 class= "prose prose-2xl text-white mt-8 mb-4">
           Transactions
         </h1>
-        <a 
-          hx-get="{% url 'create_transaction' %}"
-          hx-push-url="true"
-          hx-target="#transaction-block"
-          class="cursor-pointer"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="green" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-12">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        <div class="flex items-center">
+          <a 
+            hx-get="{% url 'create_transaction' %}"
+            hx-push-url="true"
+            hx-target="#transaction-block"
+            class="cursor-pointer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="green" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-12">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+          </a>
+          <a 
+            hx-get= "{% url 'export-transactions' %}"
+            hx-include='#filter-form'
+            class="cursor-pointer"
+          >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-10 w-10 ml-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>          
+          </a>
+          <a 
+            hx-get= "{% url 'import-transactions' %}"
+            hx-target="#transaction-block"
+            hx-push-url= 'true'
+            class="cursor-pointer"
+          >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-10 w-10 ml-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
           </svg>
-        </a>
+                  
+          </a>
+        </div>
         
       </div>
       
@@ -95,6 +117,7 @@
         hx-get="{% url 'transactions_list' %}"
         hx-target="#transaction-container"
         hx-swap="outerHTML"
+        hx-include="#spinner"
         id= 'filter-form'
       >
         <div class="mb-2 form-control">
@@ -114,5 +137,6 @@
         </div>
         <button class="btn btn-success">Filter</button>
       </form>
+      <span id='spinner' class="loading loading-spinner loading-lg text-secondary htmx-indicator"></span>
     </div>
   </div>

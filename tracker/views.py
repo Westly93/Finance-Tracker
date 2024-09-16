@@ -6,6 +6,10 @@ from .forms import TransactionForm
 from .filters import TransactionFilter
 from django_htmx.http import retarget
 from django.core.paginator import Paginator
+from .charting import income_expenses_bar, category_pie_chart
+from .resources import TransactionResource
+from django.http.response import HttpResponse
+from tablib import Dataset
 # Create your views here.
 
 from django.conf import settings
@@ -107,4 +111,62 @@ def delete_transaction(request, pk):
                 "message": f"The { transaction.type } tansaction created on {transaction.date} was deleted successfully!"
             }
     return render(request, 'tracker/partials/transaction-success.html', context)
+@login_required
+def transactions_charts(request):
+    transactions_filter = TransactionFilter(
+        request.GET,
+        queryset=Transaction.objects.filter(
+            user=request.user).select_related("category")
+    )
+    bar_chart= income_expenses_bar(transactions_filter.qs)
+    income_category_pie= category_pie_chart(
+        transactions_filter.qs.filter(type= 'income')
+    )
+    expenses_category_pie= category_pie_chart(
+        transactions_filter.qs.filter(type= 'expense')
+    )
+    context= {
+        'filter': transactions_filter,
+        'income_expenses_bar': bar_chart.to_html(),
+        'income_category_pie': income_category_pie.to_html(),
+        'expenses_category_pie': expenses_category_pie.to_html()
+    }
+    if request.htmx:
+        return render(request, 'tracker/partials/charts.html', context)
+    return render(request, 'tracker/charts-container.html', context)
+@login_required   
+def export_transactions(request):
+    if request.htmx:
+        return HttpResponse(headers= {'HX-Redirect': request.get_full_path()})
+    transactions_filter = TransactionFilter(
+        request.GET,
+        queryset=Transaction.objects.filter(
+            user=request.user).select_related("category")
+    )
+    data= TransactionResource().export(transactions_filter.qs)
+    response= HttpResponse(data.csv)
+    response['Content-Disposition']= 'attachement; filename= "transactions.csv"'
+    return response
+@login_required
+def import_transactions(request):
+    if request.method=='POST':
+        file= request.FILES.get('file')
+        resource= TransactionResource()
+        dataset= Dataset()
+        dataset.load(file.read().decode('utf-8'), format='csv')
+        result= resource.import_data(dataset,user= request.user, dry_run= True)
+        for row in result:
+            for error in row.errors:
+                print(error)
+        if not result.has_errors():
+            resource.import_data(dataset, dry_run= False)
+            context={
+                'message': f'{len(dataset)} transactions are loaded successfully'
+            }
+        else:
+            context= {
+                'message': "Sorry An Error Occured"
+            }
+        return render(request, 'tracker/partials/transaction-success.html', context)
     
+    return render(request, 'tracker/partials/import_transactions.html')

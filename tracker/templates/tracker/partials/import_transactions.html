@@ -1,0 +1,16 @@
+{% load widget_tweaks %}
+<section>
+    <h1 class= "prose prose-2xl text-white mt-8 mb-4">
+        Import Transactions
+    </h1>
+    <form hx-post="{% url 'import-transactions' %}"
+        hx-encoding="multipart/form-data"
+    >
+        <div class='mb-4'>
+            <input name= 'file' type="file" class="file-input file-input-bordered file-input-accent w-full max-w-xs text-black" accept='.csv, .xlsx' />
+        </div>
+        <button class="btn btn-success">Upload</button>
+        <button hx-get="{% url 'transactions_list' %}" hx-target="#transaction-block" hx-push-url="true" class="btn btn-error">Cancel</button>
+        </div>
+    </form>
+</section>
